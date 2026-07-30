@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" class="js">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Happy 26th</title>
+
+<!--
+  ==========================================================
+  EDIT ME  ·  change the name, the note and the photo below
+  ==========================================================
+-->
+<script>
+  const CONFIG = {
+    friendName: "Danil Linkov",   // shows on the card and in the git repo name
+    fromName:   "",               // e.g. "Callan"
+    // Handwritten note. Use \n for line breaks.
+    note:       "Happy birthday mate.\n\nTwenty-six looks good on you, even if the share price disagrees.\n\nHere's to another year of terrible commits and good times.",
+    photoUrl:    "",              // the photo that closes the card (URL or data: URI)
+    crashSeconds: 5               // seconds for the stock to fall (it steps down tick by tick)
+  };
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Caveat:wght@600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --ink:#070E24; --ink-2:#0E1A3C; --line:#1C2C55;
+    --blue:#2684FF; --blue-deep:#0C66E4;
+    --gold:#FFC53D; --up:#36B37E; --down:#FF5C5C;
+    --text:#E9EEFB; --muted:#8798BE;
+    --paper:#F7F1E4; --paper-ink:#243453;
+    --mono:"Space Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    --sans:"Space Grotesk", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --hand:"Caveat", "Segoe Script", cursive;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ background:var(--ink); }
+  body{
+    font-family:var(--sans); color:var(--text); min-height:100dvh;
+    -webkit-font-smoothing:antialiased;
+    background:
+      radial-gradient(120% 90% at 50% -10%, #12224E 0%, transparent 55%),
+      radial-gradient(90% 70% at 100% 0%, #101B3F 0%, transparent 60%), var(--ink);
+  }
+  main{ width:100%; max-width:430px; margin:0 auto; padding:0 20px calc(60px + env(safe-area-inset-bottom)); }
+
+  /* opening screen */
+  #entry{ min-height:100dvh; display:flex; flex-direction:column; justify-content:center; gap:20px; padding:28px 0; }
+
+  /* ticker box */
+  .quote{ background:linear-gradient(180deg, var(--ink-2), #0A1330); border:1px solid var(--line); border-radius:20px; padding:20px; box-shadow:0 20px 50px -30px #000; }
+  .quote.halted{ border-color:rgba(255,92,92,.45); }
+  .qhead{ display:flex; align-items:center; justify-content:space-between; }
+  .sym{ display:flex; align-items:center; gap:10px; }
+  .mark{ width:30px; height:30px; border-radius:7px; background:linear-gradient(160deg, var(--blue), var(--blue-deep)); display:grid; place-items:center; font-weight:700; font-size:15px; color:#fff; }
+  .t{ font-family:var(--mono); font-weight:700; font-size:17px; letter-spacing:.04em; }
+  .n{ font-size:11px; color:var(--muted); margin-top:1px; }
+  .stamp{ font-family:var(--mono); font-size:10px; font-weight:700; letter-spacing:.16em; color:var(--down); border:1px solid var(--down); border-radius:5px; padding:4px 7px; opacity:0; transition:opacity .3s; }
+  .stamp.on{ opacity:1; }
+  .price{ font-family:var(--mono); font-size:clamp(44px, 15vw, 60px); font-weight:700; letter-spacing:-.01em; margin:18px 0 6px; }
+  .price .c{ font-size:.5em; color:var(--muted); vertical-align:top; margin-right:2px; }
+  .chg{ font-family:var(--mono); font-size:15px; }
+  .down{ color:var(--down); } .up{ color:var(--up); }
+  .meta{ margin-top:16px; padding-top:14px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+  .live{ display:inline-flex; align-items:center; gap:6px; }
+  .dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); }
+  .dot.on{ background:var(--up); }
+  .joke{ margin-top:16px; font-size:14px; line-height:1.5; padding-left:14px; border-left:2px solid var(--gold); display:none; }
+  .joke.on{ display:block; }
+
+  /* terminal */
+  .term{ background:#050B1D; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
+  .bar{ display:flex; gap:7px; padding:11px 14px; border-bottom:1px solid var(--line); background:#0A1330; }
+  .bar i{ width:11px; height:11px; border-radius:50%; }
+  .bar i:nth-child(1){ background:#FF5F57; } .bar i:nth-child(2){ background:#FEBC2E; } .bar i:nth-child(3){ background:#28C840; }
+  .log{ font-family:var(--mono); font-size:12.5px; line-height:1.7; padding:14px 16px; min-height:104px; color:#B9C6E6; }
+  .log .add{ color:var(--up); } .log .warn{ color:var(--down); } .log .muted{ color:var(--muted); }
+  .cur{ display:inline-block; width:8px; height:15px; background:var(--up); vertical-align:-2px; margin-left:3px; animation:blink 1s steps(2) infinite; }
+  @keyframes blink{ 50%{opacity:0} }
+
+  .btn{ font-family:var(--mono); font-weight:700; font-size:16px; color:#fff; border:none; cursor:pointer; border-radius:12px; padding:16px 30px; -webkit-tap-highlight-color:transparent; touch-action:manipulation; align-self:center; transition:transform .12s, opacity .2s; }
+  .btn:active{ transform:scale(.96); }
+  .btn.push{ background:linear-gradient(160deg, var(--blue), var(--blue-deep)); box-shadow:0 16px 34px -14px var(--blue); }
+  .btn.see{ background:linear-gradient(160deg, var(--up), #2A9D6E); box-shadow:0 16px 34px -14px var(--up); }
+  .btn:disabled{ opacity:.45; }
+  .hint{ font-family:var(--mono); font-size:11px; color:#4A5A82; letter-spacing:.14em; text-transform:uppercase; text-align:center; }
+
+  /* card content = the pushed changes */
+  #rest{ display:none; flex-direction:column; gap:24px; padding-top:16px; }
+  #rest.on{ display:flex; }
+  html.js .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
+  html.js .reveal.in{ opacity:1; transform:none; }
+
+  .dateline{ font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; }
+  .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); }
+  h1{ font-weight:700; line-height:.98; letter-spacing:-.02em; font-size:clamp(46px, 15vw, 66px); margin-top:12px; }
+  h1 .num{ background:linear-gradient(120deg, var(--gold), #FF8A3D); -webkit-background-clip:text; background-clip:text; color:transparent; }
+  .sub{ margin-top:14px; color:var(--muted); font-size:15px; line-height:1.5; max-width:34ch; }
+
+  .photo{ border:1px dashed var(--line); border-radius:18px; aspect-ratio:4/3; display:grid; place-items:center; overflow:hidden; background:linear-gradient(160deg,#0C1938,#0A1430); }
+  .photo img{ width:100%; height:100%; object-fit:cover; }
+  .ph{ text-align:center; color:var(--muted); font-family:var(--mono); font-size:12px; line-height:1.6; padding:20px; }
+  .ph .cake{ font-size:40px; }
+
+  .note{ background:var(--paper); color:var(--paper-ink); border-radius:6px; padding:30px 26px 34px; position:relative; transform:rotate(-1.2deg); box-shadow:0 22px 40px -22px rgba(0,0,0,.7); background-image:repeating-linear-gradient(transparent, transparent 37px, rgba(36,52,83,.13) 38px); }
+  .note::before{ content:""; position:absolute; top:-11px; left:50%; transform:translateX(-50%) rotate(2deg); width:96px; height:24px; background:rgba(255,197,61,.55); border:1px solid rgba(255,197,61,.7); }
+  .nlabel{ font-family:var(--mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:#9A8F79; margin-bottom:10px; }
+  .nbody{ font-family:var(--hand); font-size:25px; line-height:38px; }
+  .nsign{ font-family:var(--hand); font-size:26px; margin-top:22px; text-align:right; color:#3A4F76; }
+  .foot{ text-align:center; font-family:var(--mono); font-size:10.5px; color:#4A5A82; letter-spacing:.08em; }
+
+  canvas#confetti{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:50; }
+
+  @media (prefers-reduced-motion: reduce){
+    .cur{ animation:none; }
+    html.js .reveal{ opacity:1; transform:none; transition:none; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <section id="entry">
+    <section class="quote" id="quote">
+      <div class="qhead">
+        <div class="sym">
+          <div class="mark">A</div>
+          <div><div class="t">TEAM</div><div class="n">Atlassian Corp · Sydney · 31 Jul 2026</div></div>
+        </div>
+        <div class="stamp" id="stamp">Trading halted</div>
+      </div>
+      <div class="price" id="price"><span class="c">$</span>—</div>
+      <div class="chg" id="chg">loading quote</div>
+      <div class="meta"><span id="metaLeft">—</span><span id="asof"></span></div>
+      <p class="joke" id="joke"></p>
+    </section>
+
+    <div class="term">
+      <div class="bar"><i></i><i></i><i></i></div>
+      <div class="log" id="log"><span class="muted">~/birthday $</span> <span class="cur"></span></div>
+    </div>
+
+    <button class="btn push" id="push">⎇ git push</button>
+    <div class="hint" id="hint">push if you dare</div>
+  </section>
+
+  <section id="rest">
+    <header class="reveal">
+      <div class="dateline">31 July 2026</div>
+      <div class="eyebrow">1 file changed · 26 insertions(+)</div>
+      <h1>Happy <span class="num">26<span style="font-size:.5em;vertical-align:.55em">th</span></span><span id="nameTag"></span></h1>
+      <p class="sub">The birthday commit that took down a $25B company.</p>
+    </header>
+
+    <section class="note reveal">
+      <div class="nlabel">a note for you</div>
+      <div class="nbody" id="nbody"></div>
+      <div class="nsign" id="nsign"></div>
+    </section>
+
+    <p class="foot reveal">Actual quote via public market data · the crash is a gift, not advice</p>
+
+    <section class="photo reveal" id="photo">
+      <div class="ph"><div class="cake">📸</div>drop a photo here<br>(this closes the card)</div>
+    </section>
+  </section>
+
+</main>
+<canvas id="confetti"></canvas>
+
+<script>
+const $ = id => document.getElementById(id);
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+const slug = (CONFIG.friendName||'you').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'you';
+
+/* personalise */
+$('nameTag').textContent = CONFIG.friendName ? (", " + CONFIG.friendName + "!") : "!";
+$('nbody').innerHTML = (CONFIG.note||'').split('\n').map(l=> l.trim()==='' ? '' : l.replace(/&/g,'&amp;').replace(/</g,'&lt;')).join('<br>');
+$('nsign').textContent = CONFIG.fromName ? ('— ' + CONFIG.fromName) : '';
+function setPhoto(id,url){ if(!url) return; const p=$(id); p.innerHTML='<img alt="" src="'+url+'">'; p.style.borderStyle='solid'; }
+setPhoto('photo', CONFIG.photoUrl);
+
+/* live quote */
+const FALLBACK = { price:99.98, prev:94.77 };
+const Y = 'https://query1.finance.yahoo.com/v8/finance/chart/TEAM?interval=1d&range=1d';
+const attempts = [
+  async () => parse(await (await fetch('https://corsproxy.io/?url='+encodeURIComponent(Y),{cache:'no-store'})).json()),
+  async () => parse(await (await fetch('https://api.allorigins.win/raw?url='+encodeURIComponent(Y),{cache:'no-store'})).json()),
+  async () => { const j=await (await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(Y),{cache:'no-store'})).json(); return parse(JSON.parse(j.contents)); }
+];
+function parse(d){
+  const m = d && d.chart && d.chart.result && d.chart.result[0] && d.chart.result[0].meta;
+  if(!m || typeof m.regularMarketPrice!=='number') throw 0;
+  return { price:m.regularMarketPrice, prev:(typeof m.chartPreviousClose==='number'?m.chartPreviousClose:m.previousClose) };
+}
+async function getQuote(){ for(const a of attempts){ try{ const q=await a(); if(q&&isFinite(q.price)) return q; }catch(e){} } return null; }
+
+let startPrice = FALLBACK.price, crashed = false, live = false;
+
+function paintQuote(price, prev){
+  const diff=price-(prev||price), pct=prev?diff/prev*100:0, up=diff>=0;
+  $('price').innerHTML='<span class="c">$</span>'+fmt(price);
+  $('price').style.color='var(--text)';
+  $('chg').className='chg '+(up?'up':'down');
+  $('chg').textContent=(up?'▲ +':'▼ ')+fmt(diff)+'  ('+(up?'+':'')+pct.toFixed(2)+'%)';
+  $('metaLeft').textContent='PREV CLOSE $'+fmt(prev);
+}
+paintQuote(FALLBACK.price, FALLBACK.prev);   // full box filled from the start
+
+async function loadReal(){
+  const q = await getQuote(); const real = q || FALLBACK;
+  live = !!q; startPrice = real.price;
+  $('asof').textContent = q ? 'LIVE' : 'LAST KNOWN';
+  if(crashed) $('metaLeft').innerHTML='<span class="live"><span class="dot'+(live?' on':'')+'"></span>actual $'+fmt(real.price)+'</span>';
+  else paintQuote(real.price, real.prev);
+}
+loadReal(); setInterval(loadReal, 60000);
+
+/* push → stream the commit that IS the card */
+const LINES = [
+  {t:'$ git commit -m "happy 26th, '+slug+'"'},
+  {t:'[main cafe126] happy 26th, '+slug, c:'muted'},
+  {t:' 1 file changed, 26 insertions(+)', c:'add'},
+  {t:'$ git push origin main'},
+  {t:'To github.com:'+slug+'/birthday.git', c:'muted'},
+  {t:'   f00d..cafe  main -> main', c:'add'},
+  {t:'! market impact detected — TEAM in freefall', c:'warn'}
+];
+function stream(done){
+  const log=$('log'); log.innerHTML=''; let i=0;
+  (function next(){
+    if(i>=LINES.length) return done();
+    const el=document.createElement('div');
+    if(LINES[i].c) el.className=LINES[i].c;
+    el.textContent=LINES[i].t; log.appendChild(el); i++;
+    setTimeout(next, reduce?0:(240+Math.random()*150));
+  })();
+}
+
+$('push').addEventListener('click', ()=>{
+  $('push').disabled=true; $('hint').textContent='pushing…';
+  stream(()=> setTimeout(()=>crash(startPrice), 500));
+});
+
+/* the slow, stepped crash — discrete ticks, each on a delay, with a little jitter */
+function paintCrashStep(v, from){
+  const diff=v-from, pct=from?diff/from*100:0;
+  $('price').innerHTML='<span class="c">$</span>'+fmt(v);
+  $('price').style.color='var(--down)';
+  $('chg').className='chg down';
+  $('chg').textContent='▼ '+fmt(diff)+'  ('+pct.toFixed(2)+'%)';
+}
+function crash(from){
+  crashed=true;
+  $('quote').classList.add('halted');
+  const end=0.26;
+  const stepMs=320;                                             // pause between ticks
+  const ticks=Math.max(14, Math.round(CONFIG.crashSeconds*1000/stepMs));
+  let i=0, cur=from;
+  (function tick(){
+    i++;
+    const target=from+(end-from)*(i/ticks);                     // steady step down
+    cur=target+(Math.random()-0.5)*Math.max(0.4, cur*0.03);     // lil jitter around it
+    if(cur<end) cur=end;
+    paintCrashStep(cur, from);
+    if(i<ticks && cur>end) setTimeout(tick, stepMs+(Math.random()*140-50));
+    else { paintCrashStep(end, from); settle(); }
+  })();
+}
+function settle(){
+  $('stamp').classList.add('on');
+  $('joke').textContent='One push to main on your birthday and the whole company went down with you. Worth it.';
+  $('joke').classList.add('on');
+  $('metaLeft').innerHTML='<span class="live"><span class="dot'+(live?' on':'')+'"></span>actual $'+fmt(startPrice)+'</span>';
+  $('hint').textContent='TEAM in ruins ↓';
+  revealCard();
+}
+
+/* the card appears after the push + crash */
+function revealCard(){
+  const rest=$('rest'); rest.classList.add('on');
+  const els=[...rest.querySelectorAll('.reveal')];
+  els.forEach((e,i)=> setTimeout(()=>e.classList.add('in'), i*130));
+  setTimeout(()=>{ rest.scrollIntoView({behavior:reduce?'auto':'smooth', block:'start'}); burst(120); }, 250);
+}
+
+/* confetti */
+const canvas=$('confetti'), ctx=canvas.getContext('2d'); let parts=[], raf=null;
+function size(){ canvas.width=innerWidth*devicePixelRatio; canvas.height=innerHeight*devicePixelRatio; ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+size(); addEventListener('resize', size);
+const COLORS=['#2684FF','#FFC53D','#36B37E','#FF8A3D','#E9EEFB'];
+function burst(n){ if(reduce) return; for(let i=0;i<n;i++) parts.push({x:innerWidth/2,y:innerHeight*0.42,vx:(Math.random()-0.5)*9,vy:Math.random()*-11-4,g:0.32,s:5+Math.random()*6,r:Math.random()*6.28,vr:(Math.random()-0.5)*0.4,c:COLORS[i%COLORS.length],life:130}); if(!raf) loop(); }
+function loop(){ ctx.clearRect(0,0,innerWidth,innerHeight); parts.forEach(p=>{ p.vy+=p.g;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;p.life--; ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);ctx.restore(); }); parts=parts.filter(p=>p.life>0&&p.y<innerHeight+40); if(parts.length) raf=requestAnimationFrame(loop); else { ctx.clearRect(0,0,innerWidth,innerHeight); raf=null; } }
+</script>
+</body>
+</html>
