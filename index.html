@@ -212,13 +212,13 @@ loadReal(); setInterval(loadReal, 60000);
 
 /* push → stream the commit */
 const LINES = [
-  {t:'$ git commit -m "happy 26th '+name+', fuelled by GYG"'},
-  {t:'[main 7b3f9a1] happy 26th '+name+', fuelled by GYG', c:'muted'},
+  {t:'$ git commit -m "happy 26th '+name+'"'},
+  {t:'[main 7b3f9a1] happy 26th '+name+'', c:'muted'},
   {t:' 1 file changed, 26 insertions(+)', c:'add'},
   {t:'$ git push origin main'},
   {t:'To github.com:'+slug+'/birthday.git', c:'muted'},
   {t:'   9e2a1c4..7b3f9a1  main -> main', c:'add'},
-  {t:'! market impact detected: TEAM in freefall', c:'warn'}
+  {t:'! market impact detected: back to gyg 4head', c:'warn'}
 ];
 function stream(done){
   const log=$('log'); log.innerHTML=''; let i=0;
@@ -263,7 +263,7 @@ function crash(from){
 }
 function settle(){
   $('stamp').classList.add('on');
-  $('hint').textContent='TEAM in ruins ↓';
+  $('hint').textContent='put the fries in the bag lil bro ↓';
   revealCard();
 }
 
