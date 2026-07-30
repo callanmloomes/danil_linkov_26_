@@ -5,18 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Happy 26th</title>
 
-<!--
-  ==========================================================
-  EDIT ME  ·  change the name, the note and the photo below
-  ==========================================================
--->
 <script>
   const CONFIG = {
     friendName: "Danil Linkov",   // shows on the card and in the git repo name
-    fromName:   "Callan",               // e.g. "Callan"
+    fromName:   "Callan",         // signs the note
     // Handwritten note. Use \n for line breaks.
     note:       "Happy birthday Danil.\n\nTwenty-six years and you are still gumping it 24/7 and tanking Atlassian stock.\n\nGetting real with it, you are one of the kindest people I know and you are someone who actually cares.\n\n I hope I will be lucky enough to consider you as a freind for years to come.\n\n You are an absolute G, \n\n Callan",
-    photoUrl:    "",              // the photo that closes the card (URL or data: URI)
+    photoUrl:    "image.png",     // closing photo — put a file named image.png next to this page in the repo
     crashSeconds: 4               // seconds for the stock to fall (it steps down tick by tick)
   };
 </script>
@@ -48,7 +43,8 @@
   main{ width:100%; max-width:430px; margin:0 auto; padding:0 20px calc(60px + env(safe-area-inset-bottom)); }
 
   /* opening screen */
-  #entry{ min-height:100dvh; display:flex; flex-direction:column; justify-content:center; gap:20px; padding:28px 0; }
+  #entry{ min-height:100dvh; display:flex; flex-direction:column; gap:18px; padding:32px 0 28px; }
+  .topdate{ font-family:var(--mono); font-size:12px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); text-align:center; }
 
   /* ticker box */
   .quote{ background:linear-gradient(180deg, var(--ink-2), #0A1330); border:1px solid var(--line); border-radius:20px; padding:20px; box-shadow:0 20px 50px -30px #000; }
@@ -65,11 +61,6 @@
   .chg{ font-family:var(--mono); font-size:15px; }
   .down{ color:var(--down); } .up{ color:var(--up); }
   .meta{ margin-top:16px; padding-top:14px; border-top:1px solid var(--line); display:flex; justify-content:space-between; align-items:center; font-family:var(--mono); font-size:11.5px; color:var(--muted); }
-  .live{ display:inline-flex; align-items:center; gap:6px; }
-  .dot{ width:7px; height:7px; border-radius:50%; background:var(--muted); }
-  .dot.on{ background:var(--up); }
-  .joke{ margin-top:16px; font-size:14px; line-height:1.5; padding-left:14px; border-left:2px solid var(--gold); display:none; }
-  .joke.on{ display:block; }
 
   /* terminal */
   .term{ background:#050B1D; border:1px solid var(--line); border-radius:14px; overflow:hidden; }
@@ -84,21 +75,18 @@
   .btn{ font-family:var(--mono); font-weight:700; font-size:16px; color:#fff; border:none; cursor:pointer; border-radius:12px; padding:16px 30px; -webkit-tap-highlight-color:transparent; touch-action:manipulation; align-self:center; transition:transform .12s, opacity .2s; }
   .btn:active{ transform:scale(.96); }
   .btn.push{ background:linear-gradient(160deg, var(--blue), var(--blue-deep)); box-shadow:0 16px 34px -14px var(--blue); }
-  .btn.see{ background:linear-gradient(160deg, var(--up), #2A9D6E); box-shadow:0 16px 34px -14px var(--up); }
   .btn:disabled{ opacity:.45; }
   .hint{ font-family:var(--mono); font-size:11px; color:#4A5A82; letter-spacing:.14em; text-transform:uppercase; text-align:center; }
 
-  /* card content = the pushed changes */
+  /* card content */
   #rest{ display:none; flex-direction:column; gap:24px; padding-top:16px; }
   #rest.on{ display:flex; }
   html.js .reveal{ opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease; }
   html.js .reveal.in{ opacity:1; transform:none; }
 
-  .dateline{ font-family:var(--mono); font-size:11px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; }
   .eyebrow{ font-family:var(--mono); font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--gold); }
   h1{ font-weight:700; line-height:.98; letter-spacing:-.02em; font-size:clamp(46px, 15vw, 66px); margin-top:12px; }
   h1 .num{ background:linear-gradient(120deg, var(--gold), #FF8A3D); -webkit-background-clip:text; background-clip:text; color:transparent; }
-  .sub{ margin-top:14px; color:var(--muted); font-size:15px; line-height:1.5; max-width:34ch; }
 
   .photo{ border:1px dashed var(--line); border-radius:18px; aspect-ratio:4/3; display:grid; place-items:center; overflow:hidden; background:linear-gradient(160deg,#0C1938,#0A1430); }
   .photo img{ width:100%; height:100%; object-fit:cover; }
@@ -110,7 +98,6 @@
   .nlabel{ font-family:var(--mono); font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:#9A8F79; margin-bottom:10px; }
   .nbody{ font-family:var(--hand); font-size:25px; line-height:38px; }
   .nsign{ font-family:var(--hand); font-size:26px; margin-top:22px; text-align:right; color:#3A4F76; }
-  .foot{ text-align:center; font-family:var(--mono); font-size:10.5px; color:#4A5A82; letter-spacing:.08em; }
 
   canvas#confetti{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:50; }
 
@@ -124,18 +111,19 @@
 <main>
 
   <section id="entry">
+    <div class="topdate">31 July 2026</div>
+
     <section class="quote" id="quote">
       <div class="qhead">
         <div class="sym">
           <div class="mark">A</div>
-          <div><div class="t">TEAM</div><div class="n">Atlassian Corp · Sydney · 31 Jul 2026</div></div>
+          <div><div class="t">TEAM</div><div class="n">Atlassian Corp · Sydney</div></div>
         </div>
         <div class="stamp" id="stamp">Trading halted</div>
       </div>
       <div class="price" id="price"><span class="c">$</span>—</div>
       <div class="chg" id="chg">loading quote</div>
       <div class="meta"><span id="metaLeft">—</span><span id="asof"></span></div>
-      <p class="joke" id="joke"></p>
     </section>
 
     <div class="term">
@@ -149,10 +137,8 @@
 
   <section id="rest">
     <header class="reveal">
-      <div class="dateline">31 July 2026</div>
       <div class="eyebrow">1 file changed · 26 insertions(+)</div>
       <h1>Happy <span class="num">26<span style="font-size:.5em;vertical-align:.55em">th</span></span><span id="nameTag"></span></h1>
-      <p class="sub">The birthday commit that took down a $25B company.</p>
     </header>
 
     <section class="note reveal">
@@ -161,10 +147,8 @@
       <div class="nsign" id="nsign"></div>
     </section>
 
-    <p class="foot reveal">Actual quote via public market data · the crash is a gift, not advice</p>
-
     <section class="photo reveal" id="photo">
-      <div class="ph"><div class="cake">📸</div>drop a photo here<br>(this closes the card)</div>
+      <div class="ph"><div class="cake">📸</div>image.png goes here<br>(closes the card)</div>
     </section>
   </section>
 
@@ -176,12 +160,18 @@ const $ = id => document.getElementById(id);
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const fmt = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
 const slug = (CONFIG.friendName||'you').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || 'you';
+const name = CONFIG.friendName || 'you';
 
 /* personalise */
 $('nameTag').textContent = CONFIG.friendName ? (", " + CONFIG.friendName + "!") : "!";
 $('nbody').innerHTML = (CONFIG.note||'').split('\n').map(l=> l.trim()==='' ? '' : l.replace(/&/g,'&amp;').replace(/</g,'&lt;')).join('<br>');
 $('nsign').textContent = CONFIG.fromName ? ('— ' + CONFIG.fromName) : '';
-function setPhoto(id,url){ if(!url) return; const p=$(id); p.innerHTML='<img alt="" src="'+url+'">'; p.style.borderStyle='solid'; }
+function setPhoto(id,url){
+  if(!url) return;
+  const p=$(id), img=new Image();
+  img.onload=()=>{ img.alt=''; p.innerHTML=''; p.appendChild(img); p.style.borderStyle='solid'; };
+  img.src=url;   // if the file is missing, the placeholder simply stays
+}
 setPhoto('photo', CONFIG.photoUrl);
 
 /* live quote */
@@ -199,7 +189,7 @@ function parse(d){
 }
 async function getQuote(){ for(const a of attempts){ try{ const q=await a(); if(q&&isFinite(q.price)) return q; }catch(e){} } return null; }
 
-let startPrice = FALLBACK.price, crashed = false, live = false;
+let startPrice = FALLBACK.price, crashed = false;
 
 function paintQuote(price, prev){
   const diff=price-(prev||price), pct=prev?diff/prev*100:0, up=diff>=0;
@@ -212,23 +202,23 @@ function paintQuote(price, prev){
 paintQuote(FALLBACK.price, FALLBACK.prev);   // full box filled from the start
 
 async function loadReal(){
+  if(crashed) return;                        // once it crashes, the ticker is frozen
   const q = await getQuote(); const real = q || FALLBACK;
-  live = !!q; startPrice = real.price;
+  startPrice = real.price;
   $('asof').textContent = q ? 'LIVE' : 'LAST KNOWN';
-  if(crashed) $('metaLeft').innerHTML='<span class="live"><span class="dot'+(live?' on':'')+'"></span>actual $'+fmt(real.price)+'</span>';
-  else paintQuote(real.price, real.prev);
+  paintQuote(real.price, real.prev);
 }
 loadReal(); setInterval(loadReal, 60000);
 
-/* push → stream the commit that IS the card */
+/* push → stream the commit */
 const LINES = [
-  {t:'$ git commit -m "happy 26th, '+slug+'"'},
-  {t:'[main cafe126] happy 26th, '+slug, c:'muted'},
+  {t:'$ git commit -m "happy 26th '+name+', fuelled by GYG"'},
+  {t:'[main 7b3f9a1] happy 26th '+name+', fuelled by GYG', c:'muted'},
   {t:' 1 file changed, 26 insertions(+)', c:'add'},
   {t:'$ git push origin main'},
   {t:'To github.com:'+slug+'/birthday.git', c:'muted'},
-  {t:'   f00d..cafe  main -> main', c:'add'},
-  {t:'! market impact detected — TEAM in freefall', c:'warn'}
+  {t:'   9e2a1c4..7b3f9a1  main -> main', c:'add'},
+  {t:'! market impact detected: TEAM in freefall', c:'warn'}
 ];
 function stream(done){
   const log=$('log'); log.innerHTML=''; let i=0;
@@ -273,9 +263,6 @@ function crash(from){
 }
 function settle(){
   $('stamp').classList.add('on');
-  $('joke').textContent='One push to main on your birthday and the whole company went down with you. Worth it.';
-  $('joke').classList.add('on');
-  $('metaLeft').innerHTML='<span class="live"><span class="dot'+(live?' on':'')+'"></span>actual $'+fmt(startPrice)+'</span>';
   $('hint').textContent='TEAM in ruins ↓';
   revealCard();
 }
